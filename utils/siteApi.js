@@ -7,17 +7,6 @@ function apiUrl(path) {
     return `${BASE}/${path.replace(/^\/+/, '')}`;
 }
 
-/* ============================================================
-   💡 حل بديل لمشكلة "invalid json response body":
-   بعض الاستضافات المجانية (زي InfinityFree/000webhost/unaux)
-   بتحجب أي طلب من سيرفرات خارجية (زي Railway) وترجّع صفحة HTML
-   "تحقق إنك مش بوت" بدل الـ JSON — فكانت المكتبة بتحاول تفسّرها
-   كـ JSON وتطلع بخطأ غامض. الحل هنا خطوتين:
-   1) إرسال هيدرز زي متصفح حقيقي (User-Agent/Accept) — بيحل
-      المشكلة مع أغلب أنظمة الحماية البسيطة.
-   2) لو برضو رجّعت HTML، بنكتشف ده ونرجّع رسالة خطأ واضحة
-      تشرح السبب الحقيقي بدل رسالة تقنية غامضة.
-   ============================================================ */
 const BROWSER_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
     'Accept': 'application/json',
@@ -35,7 +24,6 @@ async function fetchJson(url) {
     const raw = await res.text();
 
     if (!contentType.includes('application/json')) {
-        // الموقع رجّع HTML بدل JSON — تشخيص السبب الأرجح
         if (raw.includes('cf-browser-verification') || raw.includes('Just a moment') || /checking your browser/i.test(raw)) {
             throw new Error('الموقع محمي بجدار حماية (Cloudflare) بيحجب طلبات البوت. لازم تستثني مسار /wp-json/ من الحماية.');
         }
